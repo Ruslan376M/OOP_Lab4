@@ -141,6 +141,18 @@ namespace Лабораторная_работа__4
 				return false;
 			}
 
+			public bool checkAndSetCurrent(T obj)
+            {
+				Node buffer = first;
+				for (int i = 0; i < size; i++, buffer = buffer.next)
+					if (buffer.obj.Equals(obj))
+					{
+						current = buffer;
+						return true; 
+					}
+				return false;
+			}
+
 			public int getSize()
 			{
 				return size;
@@ -214,9 +226,19 @@ namespace Лабораторная_работа__4
 			if (e.Button == MouseButtons.Left && ctrlIsPressed)
             {
 				CCircle circle = inTheAreaOfCircle(e.X, e.Y);
-				if (circle == null)
+				if (circle != null)
 				{
-
+					if (inTheCircle)
+					{
+						if (selectedStorage.checkAndSetCurrent(circle) == true)
+							deselectOne();
+						else
+						{
+							selectedStorage.add(circle);
+							printSelectedCircle(circle.x, circle.y, circle.radius);
+						}
+							
+					}
 				}
 			}
 			else if(e.Button == MouseButtons.Left)
@@ -278,6 +300,13 @@ namespace Лабораторная_работа__4
 				}
 			}
 			return null;
+		}
+
+		private void deselectOne()
+        {
+			CCircle circle = selectedStorage.getCurrent();
+			deselectPrintedCircle(circle.x, circle.y, circle.radius);
+			selectedStorage.del();
 		}
 
 		private void deselectAll()
