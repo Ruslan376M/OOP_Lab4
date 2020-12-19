@@ -195,7 +195,11 @@ namespace Лабораторная_работа__4
 		Storage<CCircle> storage;
 		int radius = 15;
 
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+		Graphics g;
+		Bitmap image;
+		Pen circlePen = new Pen(Brushes.SteelBlue, 3);
+
+		private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 			ctrlIsPressed = e.Control;
         }
@@ -208,7 +212,12 @@ namespace Лабораторная_работа__4
         private void pictureBox_MouseUp(object sender, MouseEventArgs e)
         {
 			if (storage == null)
+			{
 				storage = new Storage<CCircle>();
+				image = new Bitmap(1920, 1080);
+				g = Graphics.FromImage(image);
+				g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+			}
 
 			if (e.Button == MouseButtons.Left && ctrlIsPressed)
             {
@@ -216,8 +225,19 @@ namespace Лабораторная_работа__4
             }
 			else if(e.Button == MouseButtons.Left)
             {
+				storage.setFirst();
+				for (int i = 0; i < storage.getSize(); i++, storage.next())
+                {
+					int x = storage.getCurrent().x;
+					int y = storage.getCurrent().y;
+					int radius = storage.getCurrent().radius;
+					if ((x - e.X) * (x - e.X) + (y - e.Y) * (y - e.Y) <= 4 * radius * radius)
+						return ;
+                }
 				storage.add(new CCircle(e.X, e.Y, radius));
-            }
+				g.FillEllipse(Brushes.SteelBlue, e.X - radius, e.Y - radius, 2 * radius, 2 * radius);
+				pictureBox.Image = image;
+			}
         }
     }
 }
