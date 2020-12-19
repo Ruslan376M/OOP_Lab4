@@ -5,7 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Лабораторная_работа__4
@@ -178,26 +178,17 @@ namespace Лабораторная_работа__4
 				else
 					return false;
 			}
-
-			~Storage()
-			{
-				current = first;
-				for (int i = 0; i < size; i++)
-				{
-					Node buffer = current.next;
-					current = buffer;
-				}
-			}
-
 		};
 
 		bool ctrlIsPressed;
 		Storage<CCircle> storage;
+		Storage<CCircle> selectedStorage;
 		int radius = 15;
+		bool inTheCircle;
 
 		Graphics g;
 		Bitmap image;
-		Pen circlePen = new Pen(Brushes.SteelBlue, 3);
+		Pen circlePen = new Pen(Brushes.Red, 5);
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
@@ -214,6 +205,7 @@ namespace Лабораторная_работа__4
 			if (storage == null)
 			{
 				storage = new Storage<CCircle>();
+				selectedStorage = new Storage<CCircle>();
 				image = new Bitmap(1920, 1080);
 				g = Graphics.FromImage(image);
 				g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
@@ -221,23 +213,82 @@ namespace Лабораторная_работа__4
 
 			if (e.Button == MouseButtons.Left && ctrlIsPressed)
             {
+				CCircle circle = inTheAreaOfCircle(e.X, e.Y);
+				if (circle == null)
+				{
 
-            }
+				}
+			}
 			else if(e.Button == MouseButtons.Left)
             {
-				storage.setFirst();
-				for (int i = 0; i < storage.getSize(); i++, storage.next())
+				deselectAll();
+				CCircle circle = inTheAreaOfCircle(e.X, e.Y);
+				if (circle == null)
                 {
-					int x = storage.getCurrent().x;
-					int y = storage.getCurrent().y;
-					int radius = storage.getCurrent().radius;
-					if ((x - e.X) * (x - e.X) + (y - e.Y) * (y - e.Y) <= 4 * radius * radius)
-						return ;
-                }
-				storage.add(new CCircle(e.X, e.Y, radius));
-				g.FillEllipse(Brushes.SteelBlue, e.X - radius, e.Y - radius, 2 * radius, 2 * radius);
-				pictureBox.Image = image;
+					circle = new CCircle(e.X, e.Y, radius);
+					storage.add(circle);
+					selectedStorage.add(circle);
+					printSelectedCircle(circle.x, circle.y, circle.radius);
+				}
+                else 
+				{
+					if (inTheCircle)
+					{
+						selectedStorage.add(circle);
+						printSelectedCircle(circle.x, circle.y, circle.radius);
+					}
+				}
 			}
         }
-    }
+
+		private void printCircle(int x, int y, int radius)
+        {
+			g.FillEllipse(Brushes.SteelBlue, x - radius, y - radius, 2 * radius, 2 * radius);
+			pictureBox.Image = image;
+		}
+
+		private void printSelectedCircle(int x, int y, int radius)
+        {
+
+			g.FillEllipse(Brushes.White, x - radius - 1, y - radius - 1, 2 * (radius + 1), 2 * (radius + 1));
+			g.FillEllipse(Brushes.LightSkyBlue, x - radius - 1, y - radius - 1, 2 * (radius + 1), 2 * (radius + 1));
+			pictureBox.Image = image;
+		}
+
+		private void deselectPrintedCircle(int x, int y, int radius)
+        {
+			g.FillEllipse(Brushes.White, x - radius - 2, y - radius - 2, 2 * (radius + 2), 2 * (radius + 2));
+			g.FillEllipse(Brushes.SteelBlue, x - radius, y - radius, 2 * radius, 2 * radius);
+			pictureBox.Image = image;
+		}
+
+		private CCircle inTheAreaOfCircle(int X, int Y)
+        {
+			storage.setFirst();
+			for (int i = 0; i < storage.getSize(); i++, storage.next())
+			{
+				int x = storage.getCurrent().x;
+				int y = storage.getCurrent().y;
+				int radius = storage.getCurrent().radius;
+				int temp = (x - X) * (x - X) + (y - Y) * (y - Y);
+				if (temp <= 4 * radius * radius)
+				{
+					inTheCircle = (temp <= radius * radius);
+					return storage.getCurrent(); 
+				}
+			}
+			return null;
+		}
+
+		private void deselectAll()
+		{
+			selectedStorage.setFirst();
+			for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
+			{
+				CCircle circle = selectedStorage.getCurrent();
+				deselectPrintedCircle(circle.x, circle.y, circle.radius);
+			}
+			selectedStorage = new Storage<CCircle>();
+		}
+	}
 }
