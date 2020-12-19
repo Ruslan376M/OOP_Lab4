@@ -42,6 +42,7 @@ namespace Лабораторная_работа__4
             this.pictureBox.Size = new System.Drawing.Size(800, 450);
             this.pictureBox.TabIndex = 0;
             this.pictureBox.TabStop = false;
+            this.pictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_Paint);
             this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
             // 
             // Form1

@@ -205,6 +205,8 @@ namespace Лабораторная_работа__4
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 			ctrlIsPressed = e.Control;
+			if (e.KeyCode == Keys.Delete)
+				deleteSelected();
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
@@ -266,7 +268,7 @@ namespace Лабораторная_работа__4
 		private void printCircle(int x, int y, int radius)
         {
 			g.FillEllipse(Brushes.SteelBlue, x - radius, y - radius, 2 * radius, 2 * radius);
-			pictureBox.Image = image;
+			//pictureBox.Image = image;
 		}
 
 		private void printSelectedCircle(int x, int y, int radius)
@@ -274,14 +276,14 @@ namespace Лабораторная_работа__4
 
 			g.FillEllipse(Brushes.White, x - radius - 1, y - radius - 1, 2 * (radius + 1), 2 * (radius + 1));
 			g.FillEllipse(Brushes.LightSkyBlue, x - radius - 1, y - radius - 1, 2 * (radius + 1), 2 * (radius + 1));
-			pictureBox.Image = image;
+			//pictureBox.Image = image;
 		}
 
 		private void deselectPrintedCircle(int x, int y, int radius)
         {
 			g.FillEllipse(Brushes.White, x - radius - 2, y - radius - 2, 2 * (radius + 2), 2 * (radius + 2));
 			g.FillEllipse(Brushes.SteelBlue, x - radius, y - radius, 2 * radius, 2 * radius);
-			pictureBox.Image = image;
+			//pictureBox.Image = image;
 		}
 
 		private CCircle inTheAreaOfCircle(int X, int Y)
@@ -319,5 +321,29 @@ namespace Лабораторная_работа__4
 			}
 			selectedStorage = new Storage<CCircle>();
 		}
-	}
+
+		private void deleteSelected()
+        {
+			selectedStorage.setFirst();
+			for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
+			{
+				CCircle circle = selectedStorage.getCurrent();
+
+				storage.setFirst();
+				for (int j = 0; j < storage.getSize(); j++, storage.next())
+					if (circle.Equals(storage.getCurrent()))
+					{
+						storage.del();
+						break;
+					}
+				g.FillEllipse(Brushes.White, circle.x - radius - 2, circle.y - radius - 2, 2 * (circle.radius + 2), 2 * (circle.radius + 2));
+			}
+			selectedStorage = new Storage<CCircle>();
+		}
+
+        private void pictureBox_Paint(object sender, PaintEventArgs e)
+        {
+			pictureBox.Image = image;
+		}
+    }
 }
