@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Drawing;
 using System.Windows.Forms;
 
 namespace Лабораторная_работа__4
@@ -91,7 +84,7 @@ namespace Лабораторная_работа__4
 			{
 				if (current != null)
 				{
-					// Переназначение указателей соседних элементов 
+					// Переназначение "указателей" соседних элементов
 					if (current.previous != null)
 						current.previous.next = current.next;
 					if (current.next != null)
@@ -107,32 +100,32 @@ namespace Лабораторная_работа__4
 					else
 						current = null;
 
-					// Смена указателей first и last, если current был им равен
+					// Смена "указателей" first и last, если current был им равен
 					if (oldCurrent == first)
 						first = current;
 					if (oldCurrent == last)
 						last = current;
 
-					// Удаление элемента из списка
+					// Коррекция размера списка
 					size--;
 				}
 			}
 
-			public void previous() // Возвращает указатель current на предыдущий элемент в списке, если предыдущий элемент существует
+			public void previous() // Переносит current на предыдущий элемент в списке, если предыдущий элемент существует
 			{
 				if (current != null)
 					if (current.previous != null)
 						current = current.previous;
 			}
 
-			public void next() // Возвращает указатель current на следующий элемент в списке, если следующий элемент существует
+			public void next() // Переносит current на следующий элемент в списке, если следующий элемент существует
 			{
 				if (current != null)
 					if (current.next != null)
 						current = current.next;
 			}
 
-			public bool check(T obj) // Проверяет наличие объекта с тем же указателем в хранилище
+			public bool check(T obj) // Проверяет наличие объекта хранилище, не изменяя current
 			{
 				Node buffer = first;
 				for (int i = 0; i < size; i++, buffer = buffer.next)
@@ -141,8 +134,8 @@ namespace Лабораторная_работа__4
 				return false;
 			}
 
-			public bool checkAndSetCurrent(T obj)
-            {
+			public bool checkAndSetCurrent(T obj) // Проверяет наличие объекта хранилище и устанавливает current на этот объект
+			{
 				Node buffer = first;
 				for (int i = 0; i < size; i++, buffer = buffer.next)
 					if (buffer.obj.Equals(obj))
@@ -158,27 +151,27 @@ namespace Лабораторная_работа__4
 				return size;
 			}
 
-			public T getFirst() // Возвращает ссылку на первый объект в списке
+			public T getFirst() // Возвращает первый объект в списке
 			{
 				return first.obj;
 			}
 
-			public T getLast() // Возвращает ссылку на последний объект в списке
+			public T getLast() // Возвращает последний объект в списке
 			{
 				return last.obj;
 			}
 
-			public T getCurrent() // Возвращает ссылку на текущий объект
+			public T getCurrent() // Возвращает текущий объект
 			{
 				return current.obj;
 			}
 
-			public void setFirst() // Устанавливает текущий указатель на начало списка
+			public void setFirst() // Устанавливает current на начало списка
 			{
 				current = first;
 			}
 
-			public void setLast() // Устанавливает текущий указатель в конец списка
+			public void setLast() // Устанавливает current на конец списка
 			{
 				current = last;
 			}
@@ -192,11 +185,11 @@ namespace Лабораторная_работа__4
 			}
 		};
 
-		bool ctrlIsPressed;
-		Storage<CCircle> storage;
-		Storage<CCircle> selectedStorage;
-		int radius = 15;
-		bool inTheCircle;
+		bool ctrlIsPressed; // Флаг для проверки нажатия кнопки Ctrl
+		Storage<CCircle> storage; // Хранилище всех объектов
+		Storage<CCircle> selectedStorage; // Хранилище выбранных объектов
+		int radius = 15; 
+		bool inTheCircle; // Флаг для проверки нажатия на круг
 
 		Graphics g;
 		Bitmap image;
@@ -204,19 +197,19 @@ namespace Лабораторная_работа__4
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-			ctrlIsPressed = e.Control;
-			if (e.KeyCode == Keys.Delete)
-				deleteSelected();
+			ctrlIsPressed = e.Control; // Если нажали кнопку Ctrl устанавливаем флаг
+			if (e.KeyCode == Keys.Delete) // Если нажали кнопку Del
+				deleteSelected(); // Удаляем выбранные круги
         }
 
         private void Form1_KeyUp(object sender, KeyEventArgs e)
         {
-			ctrlIsPressed = e.Control;
+			ctrlIsPressed = e.Control; // Если кнопку Ctrl отпустили, изменяем флаг на false 
         }
 
         private void pictureBox_MouseUp(object sender, MouseEventArgs e)
         {
-			if (storage == null)
+			if (storage == null) // Если глобальные объекты не инициализированы, инициализируем их
 			{
 				storage = new Storage<CCircle>();
 				selectedStorage = new Storage<CCircle>();
@@ -225,68 +218,58 @@ namespace Лабораторная_работа__4
 				g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 			}
 
-			if (e.Button == MouseButtons.Left && ctrlIsPressed)
+			if (e.Button == MouseButtons.Left && ctrlIsPressed) // Если одновременно нажали на ЛКМ и Ctrl
             {
-				CCircle circle = inTheAreaOfCircle(e.X, e.Y);
-				if (circle != null)
+				CCircle circle = inTheAreaOfCircle(e.X, e.Y); // Проверяем, попали ли мы в окрестность круга
+				if (circle != null) // Если попали
 				{
-					if (inTheCircle)
-					{
-						if (selectedStorage.checkAndSetCurrent(circle) == true)
-							deselectOne();
-						else
+					if (inTheCircle) // Проверяем, попали ли мы ровно на круг
+						if (selectedStorage.checkAndSetCurrent(circle) == true) // Если в хранилище выделенных объектов есть выбранный
+							deselectOne(); // Убираем его из списка выбранных
+						else 
 						{
+							// Иначе добавляем его в хранилище выбранных и выводим на экран
 							selectedStorage.add(circle);
 							printSelectedCircle(circle.x, circle.y, circle.radius);
 						}
-							
-					}
+					// Если попали в пустую область рядом с кругом, ничего не делаем
 				}
 			}
-			else if(e.Button == MouseButtons.Left)
-            {
-				deselectAll();
-				CCircle circle = inTheAreaOfCircle(e.X, e.Y);
-				if (circle == null)
+			else if(e.Button == MouseButtons.Left) // Если просто нажали на ЛКМ
+			{
+				deselectAll(); // Убираем все элементы из списка выбранных
+				CCircle circle = inTheAreaOfCircle(e.X, e.Y); // Проверяем, попали ли мы в окрестность круга
+				if (circle == null) // Если не попали
                 {
-					circle = new CCircle(e.X, e.Y, radius);
-					storage.add(circle);
-					selectedStorage.add(circle);
+					circle = new CCircle(e.X, e.Y, radius); // Создадим объект
+					storage.add(circle); // Добавим его в хранилище
+					selectedStorage.add(circle); // Добавим его в хранилище выбранных
+					printSelectedCircle(circle.x, circle.y, circle.radius); // И выведем на экран уже выбранным
+				}
+                else if (inTheCircle) // Если попали ровно по кругу
+				{
+					// Добавляем его в хранилище выбранных и выводим на экран
+					selectedStorage.add(circle); 
 					printSelectedCircle(circle.x, circle.y, circle.radius);
 				}
-                else 
-				{
-					if (inTheCircle)
-					{
-						selectedStorage.add(circle);
-						printSelectedCircle(circle.x, circle.y, circle.radius);
-					}
-				}
+				// Если попали в область рядом с кругом, ничего не делаем
 			}
         }
 
-		private void printCircle(int x, int y, int radius)
-        {
-			g.FillEllipse(Brushes.SteelBlue, x - radius, y - radius, 2 * radius, 2 * radius);
-			//pictureBox.Image = image;
-		}
-
-		private void printSelectedCircle(int x, int y, int radius)
+		private void printSelectedCircle(int x, int y, int radius) // Рисуем круг выбранным
         {
 
 			g.FillEllipse(Brushes.White, x - radius - 1, y - radius - 1, 2 * (radius + 1), 2 * (radius + 1));
 			g.FillEllipse(Brushes.LightSkyBlue, x - radius - 1, y - radius - 1, 2 * (radius + 1), 2 * (radius + 1));
-			//pictureBox.Image = image;
 		}
 
-		private void deselectPrintedCircle(int x, int y, int radius)
+		private void deselectPrintedCircle(int x, int y, int radius) // Риусем обычный круг
         {
 			g.FillEllipse(Brushes.White, x - radius - 2, y - radius - 2, 2 * (radius + 2), 2 * (radius + 2));
 			g.FillEllipse(Brushes.SteelBlue, x - radius, y - radius, 2 * radius, 2 * radius);
-			//pictureBox.Image = image;
 		}
 
-		private CCircle inTheAreaOfCircle(int X, int Y)
+		private CCircle inTheAreaOfCircle(int X, int Y) // Проверяем нажатие на точку в пределах 2R круга 
         {
 			storage.setFirst();
 			for (int i = 0; i < storage.getSize(); i++, storage.next())
@@ -295,23 +278,23 @@ namespace Лабораторная_работа__4
 				int y = storage.getCurrent().y;
 				int radius = storage.getCurrent().radius;
 				int temp = (x - X) * (x - X) + (y - Y) * (y - Y);
-				if (temp <= 4 * radius * radius)
+				if (temp <= 4 * radius * radius) // Если нажали на точку в пределах 2R круга
 				{
-					inTheCircle = (temp <= radius * radius);
-					return storage.getCurrent(); 
+					inTheCircle = (temp <= radius * radius); // Если нажали на точку в пределах круга, устанавливаем флаг
+					return storage.getCurrent();  // Выводим найденный объект круга
 				}
 			}
-			return null;
+			return null; // Если точка не принадлежит ни одному кругу, выводим нулевой указатель
 		}
 
-		private void deselectOne()
+		private void deselectOne() // Убираем один элемент из списка выбранных
         {
 			CCircle circle = selectedStorage.getCurrent();
 			deselectPrintedCircle(circle.x, circle.y, circle.radius);
 			selectedStorage.del();
 		}
 
-		private void deselectAll()
+		private void deselectAll() // Убираем все элементы из списка выбранных
 		{
 			selectedStorage.setFirst();
 			for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
@@ -322,7 +305,7 @@ namespace Лабораторная_работа__4
 			selectedStorage = new Storage<CCircle>();
 		}
 
-		private void deleteSelected()
+		private void deleteSelected() // Удаляем выбранные элементы
         {
 			selectedStorage.setFirst();
 			for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
@@ -341,7 +324,7 @@ namespace Лабораторная_работа__4
 			selectedStorage = new Storage<CCircle>();
 		}
 
-        private void pictureBox_Paint(object sender, PaintEventArgs e)
+        private void pictureBox_Paint(object sender, PaintEventArgs e) // Рисуем картинку
         {
 			pictureBox.Image = image;
 		}
