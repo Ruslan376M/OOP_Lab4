@@ -193,7 +193,6 @@ namespace Лабораторная_работа__4
 
 		Graphics g;
 		Bitmap image;
-		Pen circlePen = new Pen(Brushes.Red, 5);
 
 		private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
